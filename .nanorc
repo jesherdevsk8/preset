@@ -1,0 +1,45 @@
+# Jesher nano Preset ;)
+#===========================
+
+# Habilita ajuste suave de linhas compridas
+set softwrap
+
+# Numero de tabs
+set tabsize 2
+
+# Desabilita a insercaoo de ultima linha
+# set nonewlines
+
+# Desabilita modo de ajuda.
+# set nohelp
+
+# Mostra informacoes (col/line/cursor)
+set constantshow
+
+# Auto Identacao
+set autoindent
+
+# Tab para backspace
+set tabstospaces
+
+# Multiplos buffers por padrao
+set multibuffer
+
+# Mostra linhas no inicio
+set linenumbers
+
+####
+# Cores foreground,background
+####
+
+set titlecolor brightyellow,black
+
+set statuscolor brightcyan,black
+
+set keycolor cyan
+
+set functioncolor brightgreen
+
+set numbercolor brightmagenta,black
+
+set selectedcolor blue
