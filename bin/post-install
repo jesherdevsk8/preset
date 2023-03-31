@@ -133,6 +133,13 @@ addPpa() {
   sudo add-apt-repository "$@" -y &> /dev/null
 }
 
+upgradeAndCleanSystem() {
+  info printf '%s\n' 'Cleaning system.....'
+  sudo apt-get dist-upgrade -y
+  sudo rm -rf /var/cache/apt/archives/*.deb
+  sudo apt-get autoremove -y
+}
+
 getGithubLatestVersion() {
   local repo="$1"
   local regexUserSlashRepo='^[^/]+/[^/]+$'
@@ -312,6 +319,8 @@ main() {
   # installRvm
   installVagrant
   installDebPkg
+
+  upgradeAndCleanSystem
 }
 
 [[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@"
