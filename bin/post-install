@@ -261,7 +261,7 @@ installPPA() {
   for ppa in "${PPAs[@]}"; do
     isInstalled "${ppa##*/}" && return
     echoGreen "\n--> installing ${ppa}"
-    addPpa "${addppa}"
+    addPpa "${ppa}"
     installPkg "${ppa##*/}"
   done
 }
