@@ -171,7 +171,7 @@ installVSCode() {
 
   echo \
     "deb [arch=${ARCHITECTURE} signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
-    | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+    | sudo tee /etc/apt/sources.list.d/vscode.list &> /dev/null
 
   installPkg code
 }
@@ -182,7 +182,7 @@ installSublimeText() {
 
   # https://www.sublimetext.com/docs/linux_repositories.html#apt
   wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor \
-    | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+    | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg &> /dev/null
 
   echo "deb https://download.sublimetext.com/ apt/stable/" \
     | sudo tee /etc/apt/sources.list.d/sublime-text.list
@@ -216,7 +216,7 @@ installVagrant() {
 
   # https://developer.hashicorp.com/vagrant/downloads
   wget -qO- https://apt.releases.hashicorp.com/gpg | gpg --dearmor \
-    | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg &> /dev/null
 
   echo \
     "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com \
@@ -229,7 +229,7 @@ installRvm() {
   isInstalled rvm && return
   echoGreen "\n--> installing RVM..."
 
-  https://rvm.io/rvm/install
+  # https://rvm.io/rvm/install
   gpg --keyserver keyserver.ubuntu.com --recv-keys \
     409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   
@@ -281,18 +281,17 @@ installDebPkg() {
   info "\n--> installing packages:\n${information}"
 
   for url in "${DEB_PROGRAMS[@]}"; do
+    local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
+    dpkgInstalled ${url_extraida}
     wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
 
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
-    local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
-    
-    dpkgInstalled ${url_extraida}
     echoGreen "\n--> installing ${debPkg} packages..."
     installPkg "$debPkg"
   done
 }
 
-#---------------------------- MAIN ---------------------------------
+#---------------------------- MAIN ------------------------------vim bin---
 
 main() {
   cd "${HOME}" || return 1
