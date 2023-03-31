@@ -237,14 +237,14 @@ installRvm() {
 }
 
 # install asdf
-installAsdf() {
-  mkdir -p "${asdfDir}"
-  
+installAsdf() {  
   echoGreen "\n--> installing asdf version manager..."
   warn "WARNING: create.... '${asdfDir}': \nCheck instructions: https://asdf-vm.com/guide/getting-started.html 'asdf' in you PATH."
 
   local asdfDir="${HOME}/.asdf"
   local latestVersion
+
+  mkdir -p "${asdfDir}"
 
   latestVersion="$(getGithubLatestVersion asdf-vm/asdf)"
 
