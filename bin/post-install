@@ -203,7 +203,7 @@ installDocker() {
 
   echo \
     "deb [arch=${ARCHITECTURE} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    ${UBUNTU_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    ${UBUNTU_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list &> /dev/null
 
   installPkg docker-ce docker-ce-cli containerd.io
 
@@ -288,7 +288,7 @@ installDebPkg() {
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     
     dpkgInstalled ${url_extraida}
-    echoGreen "\n--> installing .deb packages..."
+    echoGreen "\n--> installing ${debPkg} packages..."
     installPkg "$debPkg"
   done
 }
