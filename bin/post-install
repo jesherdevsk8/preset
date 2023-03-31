@@ -110,6 +110,7 @@ installPkg() {
 }
 
 flatpakInstall() {
+  echoGreen "\n--> installing Flatpaks..."
   sudo flatpak remote-add --if-not-exists flathub "$FLATHUB"
   sudo flatpak install -y --noninteractive flathub "$@"
 }
@@ -203,7 +204,7 @@ installDocker() {
 
   echo \
     "deb [arch=${ARCHITECTURE} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    ${UBUNTU_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    ${UBUNTU_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list &> /dev/null
 
   installPkg docker-ce docker-ce-cli containerd.io
 
@@ -215,7 +216,7 @@ installVagrant() {
   echoGreen "\n--> installing Vagrant..."
 
   # https://developer.hashicorp.com/vagrant/downloads
-  wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor \
+  wget -qO- https://apt.releases.hashicorp.com/gpg | gpg --dearmor \
     | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
 
   echo \
@@ -278,8 +279,7 @@ installDebPkg() {
   mkdir -p "${DOWNLOAD_PROGRAMS_DIR}"
 
   local information=$( sed ':a;$!N;s/ /\n/;s/-/_/;ta;' <<< "${DEB_PROGRAMS[@]##*/}" )
-  printf '%s\n' 'packages:'
-  info "${information}"
+  info "\n--> installing packages: ${information}"
 
   for url in "${DEB_PROGRAMS[@]}"; do
     wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
@@ -288,7 +288,7 @@ installDebPkg() {
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     
     dpkgInstalled ${url_extraida}
-    echoGreen "\n--> installing .deb packages..."
+    echoGreen "\n--> installing ${debPkg} packages..."
     installPkg "$debPkg"
   done
 }
