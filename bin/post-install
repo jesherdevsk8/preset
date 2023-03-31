@@ -282,7 +282,11 @@ installDebPkg() {
 
   for url in "${DEB_PROGRAMS[@]}"; do
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
+<<<<<<< HEAD
     dpkgInstalled ${url_extraida}
+=======
+    dpkgInstalled ${url_extraida} && return
+>>>>>>> 05a7ad482e4648e7b9bd063a3153ceeec3a60f19
     wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
 
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
