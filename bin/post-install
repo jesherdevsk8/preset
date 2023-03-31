@@ -12,6 +12,7 @@
 
 #-------------------------- VARIABLES -----------------------------
 NON_ROOT_USER="$(who am i | awk '{print $1}')"
+BASHRC="$HOME/.bashrc"
 PPAs=(
   "ppa:agornostal/ulauncher"
   "ppa:ansible/ansible"
@@ -19,7 +20,7 @@ PPAs=(
 FLATHUB="https://flathub.org/repo/flathub.flatpakrepo"
 DOWNLOAD_PROGRAMS_DIR="/tmp/deb_programs"
 DEB_PROGRAMS=(
-  https://dl.google.com/linux/dilsrect/google-chrome-stable_current_amd64.deb
+  https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   https://dl.discordapp.net/apps/linux/0.0.25/discord-0.0.25.deb
   https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
 )
@@ -71,6 +72,7 @@ FLATPAK_PACKAGES=(
 readonly ansiRed='\e[1;31m'
 readonly ansiGreen='\e[1;32m'
 readonly ansiYellow='\e[1;33m'
+readonly ansiBlue='\e[1;36m'
 readonly ansiNoColor='\e[0m'
 
 echoRed() {
@@ -85,12 +87,20 @@ echoYellow() {
   echo -e "${ansiYellow}$*${ansiNoColor}"
 }
 
+echoBlue() {
+  echo -e "${ansiBlue}$*${ansiNoColor}"
+}
+
 err() {
   echoRed "$*" >&2
 }
 
 warn() {
   echoYellow "$*" >&2
+}
+
+info() {
+  echoBlue "$*" >&2
 }
 
 #--------------------------- FUNCTIONS -----------------------------
@@ -108,6 +118,13 @@ flatpakInstall() {
 isInstalled() {
   local command="$1"
   command -v "${command}" || return 1
+  warn "Skipping: '${command}' seems to be already installed."
+}
+
+# returns dpkg success if "$1" is installed
+dpkgInstalled() {
+  local command="$1"
+  dpkg -l | grep -iq "${command}" || return 1
   warn "Skipping: '${command}' seems to be already installed."
 }
 
@@ -191,7 +208,7 @@ installDocker() {
 }
 
 installVagrant() {
-  isInstalled rvm && return
+  isInstalled vagrant && return
   echoGreen "\n--> installing Vagrant..."
 
   # https://developer.hashicorp.com/vagrant/downloads
@@ -209,22 +226,21 @@ installRvm() {
   isInstalled rvm && return
   echoGreen "\n--> installing RVM..."
 
-  # https://rvm.io/rvm/install
+  https://rvm.io/rvm/install
   gpg --keyserver keyserver.ubuntu.com --recv-keys \
     409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   
   curl -sSL https://get.rvm.io | bash
 
-  # local BASHRC="$HOME/.bashrc"
-  addUserToGroup rvm "$NON_ROOT_USER" #&& source "$BASHRC"
-  # rvm install ruby
+  echo '# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.' >> "${BASHRC}"
+  echo 'export PATH=$HOME/.rvm/bin:$PATH' >> "${BASHRC}"
+  echo '[[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm' >> "${BASHRC}"
 }
 
 # install asdf
 installAsdf() {
   echoGreen "\n--> installing asdf version manager..."
 
-  local BASHRC="$HOME/.bashrc"
   local asdfDir="${HOME}/.asdf"
   local latestVersion
 
@@ -236,12 +252,12 @@ installAsdf() {
   latestVersion="$(getGithubLatestVersion asdf-vm/asdf)"
 
   git clone https://github.com/asdf-vm/asdf.git "${asdfDir}" --branch "${latestVersion}"
-  echo 'source "${HOME}/.asdf/asdf.sh"' >> "${BASHRC}"
-  echo 'source "${HOME}/.asdf/completions/asdf.bash""' >> "${BASHRC}"
+  echo 'source "$HOME/.asdf/asdf.sh"' >> "${BASHRC}"
+  echo 'source "$HOME/.asdf/completions/asdf.bash""' >> "${BASHRC}"
 
   # add plugins ruby and nodejs
-  asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
-  asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  # asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
+  # asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 }
 
 # installing ansible using ubuntu ppa
@@ -252,6 +268,27 @@ installPPA() {
   addPpa "${PPAs[@]}"
   installPkg ulauncher ansible
 }
+
+installDebPkg() {
+  mkdir -p "${DOWNLOAD_PROGRAMS_DIR}"
+
+  local information=$( sed ':a;$!N;s/ /\n/;s/-/_/;ta;' <<< "${DEB_PROGRAMS[@]##*/}" )
+  printf '%s\n' 'packages:'
+  info "${information}"
+
+  for url in "${DEB_PROGRAMS[@]}"; do
+    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}" &> /dev/null
+
+    local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
+    local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
+    
+    if [[ $(dpkgInstalled "${url_extraida}") = '1' ]]; then
+      echoGreen "\n--> installing .deb packages..."
+      installPkg "$debPkg"
+    fi
+  done
+}
+
 #---------------------------- MAIN ---------------------------------
 
 main() {
@@ -269,14 +306,15 @@ main() {
   installPkg "${PACKAGES[@]}"
   flatpakInstall "${FLATPAK_PACKAGES[@]}"
 
-  # My Dev tools
+  My Dev tools
   installPPA
   installVSCode
   installSublimeText
   installDocker
   installAsdf
-  # installRvm
+  installRvm
   installVagrant
+  installDebPkg
 }
 
 [[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@"
