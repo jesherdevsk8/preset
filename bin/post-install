@@ -64,6 +64,7 @@ FLATPAK_PACKAGES=(
   com.getpostman.Postman
   com.spotify.Client
   org.telegram.desktop
+  org.onlyoffice.desktopeditors
 )
 
 # functions for colorized output
@@ -123,13 +124,20 @@ isInstalled() {
 # returns dpkg success if "$1" is installed
 dpkgInstalled() {
   local command="$1"
-  dpkg -l | grep -iq "${command}" || return 1
+  dpkg -l | grep -q "${command}" || return 1
   warn "Skipping: '${command}' seems to be already installed."
 }
 
 # add ppa to repository
 addPpa() {
   sudo add-apt-repository "$@" -y &> /dev/null
+}
+
+upgradeAndCleanSystem() {
+  info printf '%s\n' 'Cleaning system.....'
+  sudo apt-get dist-upgrade -y
+  sudo rm -rf /var/cache/apt/archives/*.deb
+  sudo apt-get autoremove -y
 }
 
 getGithubLatestVersion() {
@@ -274,15 +282,14 @@ installDebPkg() {
   info "${information}"
 
   for url in "${DEB_PROGRAMS[@]}"; do
-    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}" &> /dev/null
+    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
 
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     
-    if [[ $(dpkgInstalled "${url_extraida}") = '1' ]]; then
-      echoGreen "\n--> installing .deb packages..."
-      installPkg "$debPkg"
-    fi
+    dpkgInstalled ${url_extraida}
+    echoGreen "\n--> installing .deb packages..."
+    installPkg "$debPkg"
   done
 }
 
@@ -312,6 +319,8 @@ main() {
   # installRvm
   installVagrant
   installDebPkg
+
+  upgradeAndCleanSystem
 }
 
 [[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@"
