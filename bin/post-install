@@ -123,7 +123,7 @@ isInstalled() {
 # returns dpkg success if "$1" is installed
 dpkgInstalled() {
   local command="$1"
-  dpkg -l | grep -iq "${command}" || return 1
+  dpkg -l | grep "${command}" || return 1
   warn "Skipping: '${command}' seems to be already installed."
 }
 
@@ -279,10 +279,9 @@ installDebPkg() {
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     
-    if [[ $(dpkgInstalled "${url_extraida}") = '1' ]]; then
-      echoGreen "\n--> installing .deb packages..."
-      installPkg "$debPkg"
-    fi
+    dpkgInstalled ${deb}
+    echoGreen "\n--> installing .deb packages..."
+    installPkg "$debPkg"
   done
 }
 
