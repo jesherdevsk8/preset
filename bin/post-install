@@ -122,11 +122,10 @@ isInstalled() {
   warn "Skipping: '${command}' seems to be already installed."
 }
 
-# returns dpkg success if "$1" is installed
-dpkgInstalled() {
+dpkgInstall() {
   local command="$1"
-  dpkg -l | grep -q "${command}" || return 1
-  warn "Skipping: '${command}' seems to be already installed."
+  echoGreen "\n--> installing ${debPkg} packages..."
+  sudo dpkg -i "${command}"
 }
 
 # add ppa to repository
@@ -280,14 +279,28 @@ installDebPkg() {
   local information=$( sed ':a;$!N;s/ /\n/;s/-/_/;ta;' <<< "${DEB_PROGRAMS[@]##*/}" )
   info "\n--> installing packages:\n${information}"
 
-  for url in "${DEB_PROGRAMS[@]}"; do
-    local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
-    dpkgInstalled ${url_extraida}
-    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
+  # for url in "${DEB_PROGRAMS[@]}"; do
+  #   local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
+  #   dpkgInstalled ${url_extraida}
+  #   wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
 
+  #   local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
+  #   echoGreen "\n--> installing ${debPkg} packages..."
+  #   installPkg "$debPkg"
+  # done
+
+  for url in ${DEB_PROGRAMS[@]}; do
+    local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
-    echoGreen "\n--> installing ${debPkg} packages..."
-    installPkg "$debPkg"
+
+    if ! dpkg -l | grep -q "${url_extraida}"; then
+      wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
+
+      dpkgInstall "${debPkg}"
+      installPkg -f ## sudo apt -f install -y
+    else
+      warn "\n--> Skipping: '${debPkg}' seems to be already installed."
+    fi
   done
 }
 
