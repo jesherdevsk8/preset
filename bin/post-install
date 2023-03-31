@@ -64,6 +64,7 @@ FLATPAK_PACKAGES=(
   com.getpostman.Postman
   com.spotify.Client
   org.telegram.desktop
+  org.onlyoffice.desktopeditors
 )
 
 # functions for colorized output
