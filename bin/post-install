@@ -278,8 +278,7 @@ installDebPkg() {
 
   local information=$( sed ':a;$!N;s/ /\n/;s/-/_/;ta;' <<< "${DEB_PROGRAMS[@]##*/}" )
   info "\n--> installing packages:\n${information}"
-  local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
-  
+
   # for url in "${DEB_PROGRAMS[@]}"; do
   #   local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
   #   dpkgInstalled ${url_extraida}
@@ -292,6 +291,7 @@ installDebPkg() {
 
   for url in ${DEB_PROGRAMS[@]}; do
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
+    local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
 
     if ! dpkg -l | grep -q "${url_extraida}"; then
       wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
