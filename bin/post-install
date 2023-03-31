@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------
 
 #-------------------------- VARIABLES -----------------------------
-NON_ROOT_USER="$(who am i | awk '{print $1}')"
+NON_ROOT_USER="$(who | awk '{print $1}')"
 BASHRC="$HOME/.bashrc"
 PPAs=(
   "ppa:agornostal/ulauncher"
@@ -127,10 +127,6 @@ dpkgInstalled() {
   warn "Skipping: '${command}' seems to be already installed."
 }
 
-addUserToGroup() {
-  sudo usermod -a -G "$@"
-}
-
 # add ppa to repository
 addPpa() {
   sudo add-apt-repository "$@" -y &> /dev/null
@@ -203,7 +199,7 @@ installDocker() {
 
   installPkg docker-ce docker-ce-cli containerd.io
 
-  addUserToGroup docker "$NON_ROOT_USER"
+  sudo usermod -a -G docker "${NON_ROOT_USER}"
 }
 
 installVagrant() {
@@ -239,10 +235,13 @@ installRvm() {
 # install asdf
 installAsdf() {  
   echoGreen "\n--> installing asdf version manager..."
-  warn "WARNING: create.... '${asdfDir}': \nCheck instructions: https://asdf-vm.com/guide/getting-started.html 'asdf' in you PATH."
 
   local asdfDir="${HOME}/.asdf"
   local latestVersion
+
+  if [[ -d "${HOME}/.asdf/" ]]; then
+    warn "WARNING: '${asdfDir}': directory exists but you don't have 'asdf' in you PATH.\nCheck instructions: https://asdf-vm.com/guide/getting-started.html"
+  fi
 
   mkdir -p "${asdfDir}"
 
@@ -253,17 +252,18 @@ installAsdf() {
   echo 'source "$HOME/.asdf/completions/asdf.bash"' >> "${BASHRC}"
 
   # add plugins ruby and nodejs
-  asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
-  asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  # asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
+  # asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 }
 
 # installing ansible using ubuntu ppa
 installPPA() {
-  isInstalled "${PPAs[@]}" && return
-  echoGreen "\n--> installing ulauncher and ansible..."
-
-  addPpa "${PPAs[@]}"
-  installPkg ulauncher ansible
+  for ppa in "${PPAs[@]}"; do
+    isInstalled "${ppa##*/}" && return
+    echoGreen "\n--> installing ${ppa}"
+    addPpa "${ppa}"
+    installPkg "${ppa##*/}"
+  done
 }
 
 installDebPkg() {
