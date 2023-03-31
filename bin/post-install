@@ -135,7 +135,7 @@ addPpa() {
 }
 
 upgradeAndCleanSystem() {
-  info 'Cleaning system.....'
+  info '\n--> Cleaning system.....'
   sudo apt-get dist-upgrade -y
   sudo rm -rf /var/cache/apt/archives/*.deb
   sudo apt-get autoremove -y
@@ -278,7 +278,7 @@ installDebPkg() {
   mkdir -p "${DOWNLOAD_PROGRAMS_DIR}"
 
   local information=$( sed ':a;$!N;s/ /\n/;s/-/_/;ta;' <<< "${DEB_PROGRAMS[@]##*/}" )
-  info "\n--> installing packages: ${information}"
+  info "\n--> installing packages:\n${information}"
 
   for url in "${DEB_PROGRAMS[@]}"; do
     wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
