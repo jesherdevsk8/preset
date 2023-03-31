@@ -312,7 +312,7 @@ main() {
   installSublimeText
   installDocker
   installAsdf
-  installRvm
+  # installRvm
   installVagrant
   installDebPkg
 }
