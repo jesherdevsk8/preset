@@ -274,12 +274,12 @@ installDebPkg() {
   info "${information}"
 
   for url in "${DEB_PROGRAMS[@]}"; do
-    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}" &> /dev/null
+    wget -c "${url}" -P "${DOWNLOAD_PROGRAMS_DIR}"
 
     local debPkg="${DOWNLOAD_PROGRAMS_DIR}/${url##*/}"
     local url_extraida=$( sed 's/-/_/g' <<< "${url##*/}" | cut -d _ -f 1 )
     
-    dpkgInstalled ${deb}
+    dpkgInstalled ${url_extraida}
     echoGreen "\n--> installing .deb packages..."
     installPkg "$debPkg"
   done
