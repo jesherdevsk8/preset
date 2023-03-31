@@ -135,7 +135,7 @@ addPpa() {
 }
 
 upgradeAndCleanSystem() {
-  info printf '%s\n' 'Cleaning system.....'
+  info 'Cleaning system.....'
   sudo apt-get dist-upgrade -y
   sudo rm -rf /var/cache/apt/archives/*.deb
   sudo apt-get autoremove -y
@@ -173,7 +173,6 @@ installVSCode() {
     "deb [arch=${ARCHITECTURE} signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
     | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
 
-  installPkg apt-transport-https
   installPkg code
 }
 
