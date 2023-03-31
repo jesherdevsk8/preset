@@ -29,7 +29,6 @@ PACKAGES=(
   apt-transport-https
   software-properties-common
   build-essential
-  gpg2
   vim
   bat
   htop
@@ -217,7 +216,7 @@ installVagrant() {
 
   echo \
     "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com \
-    ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+    ${UBUNTU_CODENAME} main" | sudo tee /etc/apt/sources.list.d/hashicorp.list &> /dev/null
 
   installPkg vagrant
 }
@@ -239,25 +238,23 @@ installRvm() {
 
 # install asdf
 installAsdf() {
+  mkdir -p "${asdfDir}"
+  
   echoGreen "\n--> installing asdf version manager..."
+  warn "WARNING: create.... '${asdfDir}': \nCheck instructions: https://asdf-vm.com/guide/getting-started.html 'asdf' in you PATH."
 
   local asdfDir="${HOME}/.asdf"
   local latestVersion
-
-  if [[ ! -d "${asdfDir}" ]]; then
-    mkdir -p "${asdfDir}"
-    warn "WARNING: create.... '${asdfDir}': \nCheck instructions: https://asdf-vm.com/guide/getting-started.html 'asdf' in you PATH."
-  fi
 
   latestVersion="$(getGithubLatestVersion asdf-vm/asdf)"
 
   git clone https://github.com/asdf-vm/asdf.git "${asdfDir}" --branch "${latestVersion}"
   echo 'source "$HOME/.asdf/asdf.sh"' >> "${BASHRC}"
-  echo 'source "$HOME/.asdf/completions/asdf.bash""' >> "${BASHRC}"
+  echo 'source "$HOME/.asdf/completions/asdf.bash"' >> "${BASHRC}"
 
   # add plugins ruby and nodejs
-  # asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
-  # asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
+  asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 }
 
 # installing ansible using ubuntu ppa
@@ -306,7 +303,7 @@ main() {
   installPkg "${PACKAGES[@]}"
   flatpakInstall "${FLATPAK_PACKAGES[@]}"
 
-  My Dev tools
+  # My Dev tools
   installPPA
   installVSCode
   installSublimeText
