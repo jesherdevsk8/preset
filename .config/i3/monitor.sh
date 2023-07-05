@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DP=$(xrandr | grep DP-* | cut -d ' ' -f 1)
-DVI=$(xrandr | grep DVI | cut -d ' ' -f 1)
+LVDS=$(xrandr | grep LVDS-* | cut -d ' ' -f 1)
+HDMI=$(xrandr | grep HDMI-* | cut -d ' ' -f 1)
 
-sleep 1s; xrandr --output DisplayPort-0 --off --output $DVI --mode 1600x900 --pos 0x0 --rotate normal --output $DP --mode 1024x768 --pos 1600x132 --rotate normal
+sleep 1s; xrandr --output $HDMI --mode 1366x768 --pos 0x0 --rotate normal --output $LVDS --mode 1366x768 --pos 1366x0 --rotate normal
