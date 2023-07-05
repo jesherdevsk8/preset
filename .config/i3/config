@@ -190,7 +190,7 @@ bindsym $mod+r mode "resize"
 for_window [class="^.*"] border pixel 2
 
 # For Dual monitor
-#exec bash /home/slackjeff/Scripts/monitor.sh
+#exec bash /home/arch/.config/i3/monitor.sh
 
 # launch flameshot
 bindsym $mod+shift+s exec flameshot gui
