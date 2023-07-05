@@ -195,6 +195,9 @@ for_window [class="^.*"] border pixel 2
 # launch flameshot
 bindsym $mod+shift+s exec flameshot gui
 
+# launch terminal
+bindsym $mod+t exec xfce4-terminal
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
