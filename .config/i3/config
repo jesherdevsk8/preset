@@ -186,6 +186,9 @@ bindsym $mod+r mode "resize"
 # Nitrogen wallpaper
 #exec --no-startup-id nitrogen --restore
 
+# Feh wallpaper
+#exec bash /home/arch/.config/i3/wallpaper.sh
+
 # Bordas
 for_window [class="^.*"] border pixel 2
 
