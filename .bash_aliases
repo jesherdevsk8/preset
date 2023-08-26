@@ -1,7 +1,8 @@
-## Sytem
+## System
 alias atualizar="sudo apt update && sudo apt upgrade -y && sudo apt clean && sudo apt autoremove -y"
 alias xau="shutdown -h now"
 alias renascer="shutdown -r now"
+alias ports='sudo lsof -i -P -n | grep LISTEN'
 
 ## RUBY
 alias rc="bin/rails console"
