@@ -3,6 +3,8 @@ alias atualizar="sudo apt update && sudo apt upgrade -y && sudo apt clean && sud
 alias xau="shutdown -h now"
 alias renascer="shutdown -r now"
 alias ports='sudo lsof -i -P -n | grep LISTEN'
+alias aliases='vim ~/.bash_aliases'
+alias rubolint='git diff --cached --name-only | xargs bundle exec rubocop'
 
 ## RUBY
 alias rc="bin/rails console"
