@@ -15,4 +15,6 @@ alias gts="git status"
 alias gck="git checkout"
 alias gto="git pull origin master"
 alias branch="git branch"
-
+alias gtl="git log --oneline"
+# remove merged branch
+# git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
